@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<!-- saved from url=(0081)https://quiz.vu.edu.pk/QuizQuestion.aspx?ver=652e5cfd-745e-4014-83fc-98414130d10e -->
+<html><head id="Head1"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta http-equiv="cache-control" content="max-age=0"><meta http-equiv="cache-control" content="no-cache"><meta http-equiv="expires" content="0"><meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT"><meta http-equiv="pragma" content="no-cache"><title>
+	Quiz
+</title><link href="./Quiz_files/vulms.css" rel="stylesheet">
+
+    <script type="text/javascript" async="" src="./Quiz_files/analytics.js.download"></script><script type="text/javascript" async="" src="./Quiz_files/MathJax.js.download"></script>
+    <script type="text/x-mathjax-config;;executed=true">
+        MathJax.Hub.Config({
+        extensions: ["tex2jax.js"],                
+        tex2jax: {        
+        inlineMath: [['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true
+        }
+       });              
+
+        MathJax.Hub.Register.MessageHook("Math Processing Error",function (message) {
+            console.log('in hook');
+        });
+    </script>
+    <script type="text/javascript">
+        document.onreadystatechange = () => {
+            if (document.readyState === 'complete') {
+                try {
+                    setTimeout(function () {
+                        MathJax.Hub.Queue(['Typeset', MathJax.Hub]);
+                    }, 300);
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+        };
+    </script>
+    <script src="./Quiz_files/jquery.js.download"></script>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async="" src="./Quiz_files/js"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'UA-27570524-21');
+	</script>
+    
+    <script type="text/javascript">
+        //var Question = '';
+        //var AnsArray = { 'Ans0': '', 'Ans1': '', 'An2': '', 'Ans3': '', 'Ans4': '', 'Ans5': '' };
+        var ua = navigator.userAgent.toLowerCase();
+        //// Timer (Start)
+
+        var sec = 91;
+
+        function FillQuestionAnswerArray() {
+        //    var lblq = document.getElementById("lblQuestion");
+        //    if (lblq) {
+        //        Question = lblq.innerHTML;
+        //    }
+        //    //console.log(Question);
+        //    var i = 0;
+        //    for (i = 0; i <= 6; i++) {
+        //        var lblAns = document.getElementById("lblExpression" + i);
+        //        if (lblAns) {
+        //            AnsArray['Ans' + i] = lblAns.innerHTML;
+        //            //console.log(AnsArray['Ans'+i]);
+        //        }
+        //    }
+        }
+
+        function display() {
+            
+            if (sec > 0) {
+                sec -= 1;
+            }
+                        
+            if (sec >= 0) {
+                document.getElementById("lblTime").innerHTML = sec;
+            }
+            
+            if (sec <= 0) {
+                      
+                document.getElementById("btnSave").style.visibility = 'hidden';
+                document.getElementById("btnSave").style.display = 'none';
+
+                if ($('input[name=rbtn]:checked').val() >= 0) {                                       
+
+                    //Call for Auto save
+                    AutoSaveQuizAnswer($('input[name=rbtn]:checked').val());
+
+                    document.getElementById('msgSubmit').style.visibility = 'visible';
+                    document.getElementById('msgSubmit').style.color = "Green";
+                    document.getElementById('msgSubmit').innerHTML = 'Saving and loading next question...';
+
+                    // Interval of 5 sec before switch to next question                    
+                    setTimeout("display()", 5000);
+                    
+                }
+                else {
+
+                    if (document.getElementById('msgSubmit').innerHTML != 'Saving...' || document.getElementById('msgSubmit').innerHTML != 'Saving and loading next question...') {
+
+                        document.getElementById('msgSubmit').style.visibility = 'visible';
+                        document.getElementById('msgSubmit').style.color = "Red";
+                        document.getElementById('msgSubmit').innerHTML = 'Question Timeout: Now loading next question...';
+
+                        // Interval of 1 Sec before switch to next question
+                        setTimeout(function () {
+                            document.location.href = 'GetQuestion.aspx';
+                        }, 1000);
+                        
+                    }
+                }
+                               
+            }
+
+            if (sec < 45) {
+
+                if (document.getElementById("btnSave").disabled) {
+                    document.getElementById("imgAlertSelect").style.visibility = 'visible';
+                    document.getElementById("imgAlertSelect").style.display = 'inline';
+                }
+                else {
+                    document.getElementById("imgAlertSelect").style.visibility = 'hidden';
+                    document.getElementById("imgAlertSelect").style.display = 'none';
+                    document.getElementById("imgAlertSave").style.visibility = 'visible';
+                }
+            }
+
+            if (sec > 0) {
+                if (document.getElementById('msgSubmit').innerHTML != 'Saving...') {
+                    setTimeout("display()", 1000);
+                }
+            }
+
+        }
+        // Timer(End)
+
+        //Callbacks
+        function AutoSaveQuizAnswer(selVal) {
+            CallServer(selVal);
+        }
+
+        function ReceiveServerData(rValue) {
+
+            console.log(rValue);
+
+            if (rValue == "SVD") {
+                setTimeout(function () {document.location.href = 'GetQuestion.aspx';}, 1000);
+            }
+            else if (rValue == "QF") {
+                alert('------------------Quiz Finished!------------------\n\nYour quiz has been finished already.\nYour answer is not saved.');                
+                setTimeout(function () { document.location.href = 'QuizFinished.aspx'; }, 1000);
+            }
+            else if (!isNaN(rValue)) {
+                alert('--------------------Question Timeout!--------------------\n\nYou have spent ' + rValue + ' seconds on this question.\nYour answer is not saved.\n\nPress OK to view next question.');
+                setTimeout(function () { document.location.href = 'GetQuestion.aspx'; }, 1000);
+            }
+            else if (rValue == "ASVD") {
+                alert('The answer for this question is already saved.');
+                setTimeout(function () { document.location.href = 'GetQuestion.aspx'; }, 1000);
+            }
+            else if (rValue == "LHNF") {
+                alert('There is some problem while saving. Please restart the quiz!');
+                window.close();
+            }            
+            
+            //document.location.href = 'GetQuestion.aspx';
+            //setTimeout(function () {
+            //    document.location.href = 'GetQuestion.aspx';
+            //}, 1000);
+        }
+
+        function CheckWindowName() {
+            try {
+                //console.log(window.name);
+                if (window.name != "QuizQuestions") {
+                    //document.location.href = 'AccessDenied.aspx';
+                }
+
+                if (ua.indexOf('msie') > 0 || ua.indexOf('trident') > 0) {
+                    try { window.opener.postMessageInterface('quizopened', window); } catch (err) { console.log(err.message); }
+                    if (window.opener.postMessage) {
+                        try { window.opener.postMessage('quizopened', '*'); } catch (err) { }
+                    }
+
+                } else {
+                    if (window.opener.postMessage) {
+                        try { window.opener.postMessage('quizopened', '*'); } catch (err) { }
+                    }
+                }
+            }
+            catch (err) { console.log(err.message);}
+        }
+
+
+
+
+        }
+
+        function EnableNextButton() {
+            document.getElementById("btnSave").disabled = false;
+
+        }
+
+        function NextButtonStatus(ctrl) {
+            ctrl.style.visibility = 'hidden';
+            ctrl.style.display = 'none';
+            document.getElementById('msgSubmit').style.visibility = 'visible';
+            document.getElementById('msgSubmit').style.color = "Green";
+            document.getElementById('msgSubmit').innerHTML = 'Saving...';
+        }
+
+        function DisposeEscape(event) {
+            event = event || window.event;
+            var key = event.keyCode ? event.keyCode : event.charCode;
+            //console.log(key);//116=F5  --Alt=18 escape=27
+                return;
+        }
+
+        function back(event) {
+            if (window.event) // IE
+
+            {
+                if (event.keyCode == 8 && !event.srcElement.value) {
+                    return false;
+                }
+            }
+            else if (event.which) // Netscape/Firefox/Opera
+            {
+                var keynum = event.which;
+                if (keynum == 8) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+
+        function clickIE4() {
+            if (event.button == 2) {
+                return false;
+            }
+        }
+
+        function clickNS4(e) {
+            if (document.layers || document.getElementById && !document.all) {
+                if (e.which == 2 || e.which == 3) {
+                    return false;
+                }
+            }
+        }
+
+        if (document.layers) {
+            document.captureEvents(Event.MOUSEDOWN);
+            document.onmousedown = clickNS4;
+        }
+        else if (document.all && !document.getElementById) {
+            document.onmousedown = clickIE4;
+        }
+
+       // document.oncontextmenu = new Function("return false;")
+
+
+        function reloadEquations() {
+
+            ////Question = "\\begin{align*}b &= a^2 - 5a + 3\\end{align*}"; error
+
+            ////var latex = document.createElement("div");
+            ////latex.innerHTML = "\\begin{align*}b &= a^2 - 5a + 3\\end{align*}";
+            ////MathJax.Hub.Queue(['Typeset', MathJax.Hub, latex]);
+            //var div = document.getElementById("lblQuestion");
+            ////console.log(Question)
+            //div.innerHTML = Question;
+            //var i = 0;
+            //for (i = 0; i <= 6; i++) {
+            //    var lblAns = document.getElementById("lblExpression" + i);
+            //    if (lblAns) {
+            //        lblAns.innerHTML = '';
+            //        lblAns.innerHTML = AnsArray['Ans' + i];
+            //    }
+            //}
+
+            MathJax.Hub.Queue(['Typeset', MathJax.Hub]);
+        }
+
+    </script>
+
+
+<link href="./Quiz_files/ftbStyles.css" type="text/css" rel="stylesheet"><link href="./Quiz_files/vulms(1).css" type="text/css" rel="stylesheet"><style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</style><style type="text/css">.MathJax_Preview .MJXf-math {color: inherit!important}
+</style><style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXp-script {font-size: .8em}
+.MJXp-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXp-bold {font-weight: bold}
+.MJXp-italic {font-style: italic}
+.MJXp-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-largeop {font-size: 150%}
+.MJXp-largeop.MJXp-int {vertical-align: -.2em}
+.MJXp-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXp-display {display: block; text-align: center; margin: 1em 0}
+.MJXp-math span {display: inline-block}
+.MJXp-box {display: block!important; text-align: center}
+.MJXp-box:after {content: " "}
+.MJXp-rule {display: block!important; margin-top: .1em}
+.MJXp-char {display: block!important}
+.MJXp-mo {margin: 0 .15em}
+.MJXp-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXp-denom {display: inline-table!important; width: 100%}
+.MJXp-denom > * {display: table-row!important}
+.MJXp-surd {vertical-align: top}
+.MJXp-surd > * {display: block!important}
+.MJXp-script-box > *  {display: table!important; height: 50%}
+.MJXp-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXp-script-box > *:last-child > * {vertical-align: bottom}
+.MJXp-script-box > * > * > * {display: block!important}
+.MJXp-mphantom {visibility: hidden}
+.MJXp-munderover {display: inline-table!important}
+.MJXp-over {display: inline-block!important; text-align: center}
+.MJXp-over > * {display: block!important}
+.MJXp-munderover > * {display: table-row!important}
+.MJXp-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXp-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXp-mtr {display: table-row!important}
+.MJXp-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXp-mtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-mlabeledtr {display: table-row!important}
+.MJXp-mlabeledtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mlabeledtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXp-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXp-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXp-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXp-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXp-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXp-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXp-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXp-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXp-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXp-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_PHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+<body class="noselect" oncopy="return false" oncut="return false" onpaste="return false" onload="javascript:window.history.go(+1);display();CheckWindowName();FillQuestionAnswerArray();" onkeypress="DisposeEscape(event);" onkeydown="javascript:return back(event);" data-new-gr-c-s-check-loaded="14.1018.0" data-gr-ext-installed=""><div id="MathJax_Message" style="display: none;"></div>
+    <form name="form1" method="post" action="https://quiz.vu.edu.pk/QuizQuestion.aspx?ver=652e5cfd-745e-4014-83fc-98414130d10e" id="form1">
+<div>
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="">
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUJOTk3NzM4NDQxDxYKHgZBbnNJRDAFBjE0MDcxMB4GQW5zSUQxBQYxNDA3MDkeBkFuc0lEMgUGMTQwNzExHgZBbnNJRDMFBjE0MDcxMh4TVmFsaWRhdGVSZXF1ZXN0TW9kZQIBFgICAw9kFgICAQ9kFgRmD2QWAmYPZBYCZg8PFgIeBFRleHQFFjA0OjE0IFBNLCAyNCBKdW5lIDIwMjFkZAICD2QWAmYPZBYOZg8PFgIfBQUBMmRkAgEPDxYCHwUFGTA0OjE1OjIyIFBNLCAyNCBKdW5lIDIwMjFkZAICDw8WAh8FBQExZGQCAw8WAh4Fc3R5bGUFvAF3aWR0aDogOTklOyBwYWRkaW5nOjVweDsgbWluLWhlaWdodDo5MHB4O21heC1oZWlnaHQ6MTgwcHg7b3ZlcmZsb3cteTogYXV0bzsgb3ZlcmZsb3cteDogYXV0bzsgbWFyZ2luLWxlZnQ6IDBweDsgdGV4dC1hbGlnbjogbGVmdDsgYm9yZGVyOiAxcHggc29saWQgIzI2NzU5ZTsgYm9yZGVyLWxlZnQ6IDVweCBzb2xpZCAjMjY3NTllOxYkAgEPFgIeB1Zpc2libGVoZAIDDxYCHwdoZAIHDxYCHwdoFhYCAQ8PZBYCHgVTdHlsZQUpZGlzcGxheTpub25lO29wYWNpdHk6MDtwb3NpdGlvbjphYnNvbHV0ZTtkAgMPDxYEHwUFEmczRGhEIGJxVEY4IExnbUlBIB8HaBYCHwgFKWRpc3BsYXk6bm9uZTtvcGFjaXR5OjA7cG9zaXRpb246YWJzb2x1dGU7ZAIFDw8WBB8FBaABYnRQR2RxRSBHcTBUQXggIEZwRyAgWjMgSkY1SDB2YyBmc2JnaVNZIFFRMWRRTXkgcHJUTDN2OSBVZVFWVEhCIFhUOG81QkEgN1lOc05LWiBIUHdUb0Z2IHBuNjdhY3cgb3d3IG14MiA2MjBVbDZzIEJndnFUbG4genZjR2JnSSBHY3I0IGZUIER0MkJwNksgWEY4Y0lkVyBnTFJzMWlZIB8HaBYCHwgFKWRpc3BsYXk6bm9uZTtvcGFjaXR5OjA7cG9zaXRpb246YWJzb2x1dGU7ZAIHDw8WAh8FBcwBYXQya3EgdiBaSjAgVjFIOFggQlhFcEwgTFplREMgY1dBQUkgTkg2NUQgOTlzOE0gbTc1aHMgUkdZdGwgM1dOSG8gbG8gUm4gSTkgYm8gbzVNRVkgQkZHTUEgTjM2bVYgRzdock8gMDR6UnQgVkpLVmUgbUk0NGUgVzN2RVMgenJhaEogcnJwNVEgSzJpeHkgdUc0bWMgMjRVSXAgZjljaDkgTU5NSHIgSjNzaGIgRXdQZkQgdSBISFUgcTlpQzAgREdCMkUgc3BoNWQgFgIfCAUpZGlzcGxheTpub25lO29wYWNpdHk6MDtwb3NpdGlvbjphYnNvbHV0ZTtkAgkPDxYEHwUFxgE3cUxnWCBwWCBrSEdxT2Y1UCBDRXhUTkVsUiBYZEJ6TlVycCBUYkZkWUJUdyBibjk1dm8xeCA3WVpUVm0gRCBmNHRVN1prICBydEZOSjExYSBVYVNCRnF5SiBtZUJZNUdESCBMYzg0aTl6bSBjSk9iU3BYZiA3WThVRDg4WiBIU0kyenZEVSBaN2JHMzcyViBNR3o1THcxNyBzeDFnSFNlTiBlaXkgQUZYUiBmM25Vb3JuYSA2b2k2SmNwbSAxTExjRHluZyAfB2gWAh8IBSlkaXNwbGF5Om5vbmU7b3BhY2l0eTowO3Bvc2l0aW9uOmFic29sdXRlO2QCCw8PFgQfBQUSICAgICAgICAgICAgICAgICAgHwdoFgIfCAUpZGlzcGxheTpub25lO29wYWNpdHk6MDtwb3NpdGlvbjphYnNvbHV0ZTtkAg8PDxYCHwUFTTN5Q1VLQyB3Z1RSWlIga2hVYWsxIGx2S2hkYiAzbUlZNFYgcFNSZjBaIFlCQUQyYiBvMm9IY1UgMUsyTG4xIEdWdkExeiA0R244Q2cgFgIfCAUpZGlzcGxheTpub25lO29wYWNpdHk6MDtwb3NpdGlvbjphYnNvbHV0ZTtkAhEPDxYEHwUFbDlkIHI0IG5TIEJRIENJIDRtIFl3IGtYIDd2IDNNIEdaIEllIEZ5IEpiIEp4IFlxICBnIEg4IEQ2IHlrIGxHICA3IDFpIE1GIHFnIEkyIGYwIEtsIEZtICBaIGkgIGdnIFRQIFZSIFlsIHViIB8HaBYCHwgFKWRpc3BsYXk6bm9uZTtvcGFjaXR5OjA7cG9zaXRpb246YWJzb2x1dGU7ZAITDw8WBB8FBUw2VEMgOUFLIG94ViBlV0QgWDZrIEpHeSBEdEcgSWFVICB0byBueDQgUmVXIEg1dyB5S1UgNDdkIGVlTiBNdVggRm5tIEFSYiBFelMgHwdoFgIfCAUpZGlzcGxheTpub25lO29wYWNpdHk6MDtwb3NpdGlvbjphYnNvbHV0ZTtkAhUPDxYEHwUFmAFSS2ggeGI5IDB5UiBScWIgWW01IE5JdiBERTYgZ1c5IEFRbCBUcnkgVmNHIE1RYSBNSDYgZG9SIDY1ZCBWUmEgcVhpIFFiNCBXS1ggaDZ2IFlnZyB1Nm4gRW1GIDVhYSB6IHIgcWsxIDZQOSBsRUQgcGViIE0wZiBuRUwgTHBnIEtOOSAwckYgRnVXIGl0TCBPR0EgNmxyIB8HaBYCHwgFKWRpc3BsYXk6bm9uZTtvcGFjaXR5OjA7cG9zaXRpb246YWJzb2x1dGU7ZAIXDw8WAh8FBaEBd09NTWUxIG0ydyBURiAgV2xrT0cgMWd6RFBsIFJnV0E4dSBPcnV3cksgRTdJaFB6IGxmS3JURyBBRjE0ZWUgMjE4QzU4IGZVM2JWRCBuZEZLT1IgOFVCOXVLIEtCeXI5RCBDVW1xRCAgTGJjS2I0IEVrdmhlUCBhMDBsNnYgTjJIejJEIEtaVUFJYSBzNktnOU4gT3lTR0ZsIHFDeVNxayAWAh8IBSlkaXNwbGF5Om5vbmU7b3BhY2l0eTowO3Bvc2l0aW9uOmFic29sdXRlO2QCCQ8WAh8HaGQCCw8WAh8HaGQCDQ8WAh8HaGQCDw8PFgIfBQU8TXNZME0gSzFua0kgOW5rZUsgdVpoZTMgMW9GSU0gZ3l5aSAgZzJKTFggc25CdjkgcVdEZ3ogR3lCSjYgFgIfBgUcb3BhY2l0eTowO3Bvc2l0aW9uOmFic29sdXRlO2QCEQ8PFgIfBQWRAk5xT3h0ICBXcnBGb0QgZFVCaE1JIHJ1Z3pYZSBPZVUga2YgUzVZblYxIHBvdHpGNiBvWVZWU1MgT3MzWmxyIFpxQ0pSbyBQeGdpWHQgTzE4SzN6IHEyWWxtOCB0MndiVjIgbTNVSXhHIHpPRmVTaSAwZWJEaDEgVGR6Rkp0IEJQZURzWiAyT0xwNjMgSGdGQ21wIDNta1B2ZyA3WVZFdFIgRFF2Q2dRIEM1eFFuZSBITWlpNmEgeHIya015IGtXdzdHRCBleXczVXEgSWVhWWFyIDJuOGZoUyA4WTFVaWIgWnZlNnR2IHdFejNNWSBTTzEy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">
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['form1'];
+if (!theForm) {
+    theForm = document.form1;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+
+<script src="./Quiz_files/WebResource.axd" type="text/javascript"></script>
+
+
+<script type="text/javascript">
+//<![CDATA[
+function CallServer(arg, context) { WebForm_DoCallback('__Page',arg,ReceiveServerData,context,null,false)} ;//]]>
+</script>
+
+<div>
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="CF57C892">
+	<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEdABBdYEmX9rj4psPiVW3O6MRDvUEyvI9Kme00FJ3f9RH5MEIUoqmVxMMlLndio1EvAQlvrk1EjdOOnbY3R07YUDWS9CSdiGGu8BMLe+wVMv1PnqEOJ4jikoVEOqm6fhxd4KPQN/n3U03FPxV911gQISsUt8WdUFKpw8dXs0AlbhBE6wY03YkpU56FwDOldDWIJa8Mb+/b6nQ5Ft7cZ1zS4XEBLyHg/gXq6PGQggvVhSEsQdvn4sm2ioN19LqCqAeE7bHIb0TjPeEG9Iyd1sbLn5Ci2Z8JNBN/Bju5LKnbR8wmrVZVaA1wtoSvVVhq3RrtbluWWIA8pj4q9GaeJhWM25CIkHasPrK1xw0eouacDtyiLFGW6P2lx3OmMYcr/1BEISs=">
+</div>
+        
+        <div style="width: 98%; margin: auto;">
+            <table id="tblQuizQuestions" border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
+	<tbody><tr>
+		<td>
+                        <table border="0" cellpadding="5" cellspacing="0" width="100%" style="table-layout: auto;">
+                            <tbody><tr>
+                                <td style="height: 40px; width: 50%; text-align: left; vertical-align: top;" nowrap="nowrap">
+                                    <span class="tblheadingblue" style="display: block; margin-top: 8px;">
+                                        BC190201004: USMAN KHAN
+                                    </span>
+                                </td>
+                                <td style="text-align: right; vertical-align: top; margin: 3px 3px 0px 3px;" nowrap="nowrap">
+                                    <table border="0" cellpadding="3" cellspacing="0" class="quizTimer" style="margin-right: 0; margin-left: auto;">
+                                        <tbody><tr>
+                                            <td id="title" colspan="2" class="error txtbold" align="center" nowrap="nowrap">Time Left
+                                            </td>
+                                            <td align="center" nowrap="nowrap" class="txtWhite">
+                                                <span id="lblTime" style="font-size: 18px;">84</span>
+                                                <br>
+                                                sec(s)
+                                            </td>
+                                            <td align="center" nowrap="nowrap">
+                                                <img src="./Quiz_files/quiz_loading.gif" alt="" id="imgLoading">
+                                            </td>
+                                        </tr>
+                                    </tbody></table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left; padding-top: 0px">
+                                    <span id="lblCourseCode" class="txtbold">CS605:Grand Quiz</span>
+                                </td>
+                                <td style="text-align: right; text-wrap: none; padding-top: 0px">
+                                    <span class="txtbold txtPurple">Quiz Start Time:
+                                            <span id="lblStartTime">04:14 PM, 24 June 2021</span>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody></table>
+                    </td>
+	</tr>
+	<tr>
+		<td>
+                        <hr class="hr-style">
+                    </td>
+	</tr>
+	<tr>
+		<td>
+                        <table border="0" cellpadding="2" cellspacing="1" width="100%">
+                            <tbody><tr>
+                                <td class="txtbold" style="width: 50%;" align="left" nowrap="nowrap">Question #
+                                            <span id="lblRemainingQs">2</span>
+                                    of
+                                            30
+                                            ( <span class="error">Start time:
+                                                <span id="lblLoadTime">04:15:22 PM, 24 June 2021</span>
+                                            </span>)
+                                </td>
+                                <td style="width: 50%; text-align: right;" nowrap="nowrap">
+                                    <span class="txtbold">Total Marks: </span>
+                                    <span id="lblMarks">1</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="noselect" align="left" style="padding:5px;">
+                                    <div id="divnoselect" style="width: 99%; padding:5px; min-height:90px;max-height:180px;overflow-y: auto; overflow-x: auto; margin-left: 0px; text-align: left; border: 1px solid #26759e; border-left: 5px solid #26759e;">
+                                        
+                                        
+                                        
+                                        <div id="MkwdEdnykvPCOFHlsXxYzHWrTkQcpShtUbVuVrxVkwjKqYYqWYKwewOEOEJVNKJROXiokOPBbcpDZLBvMbGRIlOZMQgRicHZmSxSqlFHIJVBHLgDCOInEtJdIJbUjzU_VPRHOjEcVzI_QNRBkcOTTUVuITJhJmZJpWgtuZpUKhSFkKNwtZkGkBgAvYzvZYSka_KuhZILnvInCPKzGOpkCSaoqgzVavvmOigl_TPTRYTqttzfO_pLkiiHZWDAbnlt_XZUjaznzVTe_kwyiTHbFkBgAYLePOteoaqVUexpBBNPPDIqaGTIgKoQVtTKOVYkdpqZubdDXTaDWnRyQWDIwlzena_cKmagedmaOkw_ePlNlkuibWvtSPpsqMnUbBultuauArjhaDfg28695_m36" class="noselect" style="height: 0px; overflow-y: auto; overflow-x: hidden; padding: 0px 0px 0px 0px; text-align: left; float: left; width: 99%;"></div>
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        <textarea name="dNzjaySJxh2869508" rows="7" cols="20" id="dNzjaySJxh2869508" class="control" disabled="disabled" style="background-color:#F4F4F4;width:10%;opacity:0;position:absolute;">MsY0M K1nkI 9nkeK uZhe3 1oFIM gyyi  g2JLX snBv9 qWDgz GyBJ6 </textarea>
+                                        
+                                        <textarea name="yqATwsm_seNhOVlfNYFLWNPVNzGQWelSFZWCdlx_AzuwLCQjbWBCoZVlbgGxmVeOuvcp_iCccFLXUTJKiXq_cifhElcxe_OgVfCQbcktUZaiOyQHWxPOffmLQvlOGFydrfCpRtjGoyfDHxSGUUbil_ArurAgsWnObysjwcrdNIbi_iDTdeumfQtsfMvatCPSKRdKFkLteyUcZTrMohDNcBkKFAEkiQlKuIXjFuOuTBIiwQSLVinL_BqJiSFFfbKNMJiQwIHvTKvbtB2869526" rows="7" cols="20" id="yqATwsm_seNhOVlfNYFLWNPVNzGQWelSFZWCdlx_AzuwLCQjbWBCoZVlbgGxmVeOuvcp_iCccFLXUTJKiXq_cifhElcxe_OgVfCQbcktUZaiOyQHWxPOffmLQvlOGFydrfCpRtjGoyfDHxSGUUbil_ArurAgsWnObysjwcrdNIbi_iDTdeumfQtsfMvatCPSKRdKFkLteyUcZTrMohDNcBkKFAEkiQlKuIXjFuOuTBIiwQSLVinL_BqJiSFFfbKNMJiQwIHvTKvbtB2869526" class="control" disabled="disabled" style="background-color:#F4F4F4;width:99%;opacity:0;position:absolute;">18 Kk xD 0f q9 UK Uo dP Hq QR FR st Jz KC R8 fv eV Ut Yq Rl X3 CM IO J0 xF eG 9V al Rs </textarea>
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        <textarea name="LKvaFLadLyVVIeZCmdEcFhTgQyKcIxefra_jJXIvUPlpVkLT2869511240" rows="7" cols="20" id="LKvaFLadLyVVIeZCmdEcFhTgQyKcIxefra_jJXIvUPlpVkLT2869511240" class="control" disabled="disabled" style="background-color:#F4F4F4;width:99%;">In case some software, it is extremely easy to operate with intuitive interface conforming to most excellent GUI practices of the industry. It needs very little training -----------------
+
+
+</textarea>
+                                        
+                                        <textarea name="VAbarOFPXrmPOUIPTucWdwfUDhFyswejsYvqeJVxkpXTpvqWjxuzDfLZWHWJIHYcNCXraSmKYfmoYLfJrkOwBggNMVUXoMocRwGmX_wRKkaYtXAKcMSZtcahXKeFyPWLrKXdFunsoylSFHVqUJvbvPjpVZONVrTvNPiiAYEjaamwrIcQpplpUwRcbiHhfaWxfqEranqwEMAUeozNxzYhFfbSyFHSQYDADpRADmrB_qkHvxzokvkhBqr_PntUgXfhJAQpXyJLHXhQvTXAHUiWoXzOyRmRtWWcKCzuhJQnlZZfIaExPtNLpJumCCrFLtTmBEGtUdUyDwmPzUFXMqBAIKnBJMseTLbtFneEUMcnYQIuXeoixTuWrTdrSFkHmqftUuJLrBDANPctCuefZKh_SEBnKnmOdUAjmQZeVcswQuJcrlpYcEjbIgbQsXBDPpXuOuGmU_KxTmjYwZwayOnZmaaGpJmybohbWPOyeCDcumIXxCUTbbFBCzIpUAxLNMWfFIChLzwwKKf_RCKnqTX_igYYHZddFtOhQdSo_oHcgKrsUIXRrKWvqWyZkfZnWSqRwykolWnBMwUXphEzBMnwXUsugtEVOVGNVawWYkgUXUivCalDbalJguucGrItSSospHCPlibSgSZDmysFHAvokxhbgUQibo2869568" rows="7" cols="20"  id="VAbarOFPXrmPOUIPTucWdwfUDhFyswejsYvqeJVxkpXTpvqWjxuzDfLZWHWJIHYcNCXraSmKYfmoYLfJrkOwBggNMVUXoMocRwGmX_wRKkaYtXAKcMSZtcahXKeFyPWLrKXdFunsoylSFHVqUJvbvPjpVZONVrTvNPiiAYEjaamwrIcQpplpUwRcbiHhfaWxfqEranqwEMAUeozNxzYhFfbSyFHSQYDADpRADmrB_qkHvxzokvkhBqr_PntUgXfhJAQpXyJLHXhQvTXAHUiWoXzOyRmRtWWcKCzuhJQnlZZfIaExPtNLpJumCCrFLtTmBEGtUdUyDwmPzUFXMqBAIKnBJMseTLbtFneEUMcnYQIuXeoixTuWrTdrSFkHmqftUuJLrBDANPctCuefZKh_SEBnKnmOdUAjmQZeVcswQuJcrlpYcEjbIgbQsXBDPpXuOuGmU_KxTmjYwZwayOnZmaaGpJmybohbWPOyeCDcumIXxCUTbbFBCzIpUAxLNMWfFIChLzwwKKf_RCKnqTX_igYYHZddFtOhQdSo_oHcgKrsUIXRrKWvqWyZkfZnWSqRwykolWnBMwUXphEzBMnwXUsugtEVOVGNVawWYkgUXUivCalDbalJguucGrItSSospHCPlibSgSZDmysFHAvokxhbgUQibo2869568" class="control" disabled="disabled" style="background-color:#F4F4F4;width:99%;opacity:0;position:absolute;">MI  9g6 V r tMS YBg uDO Zde </textarea>
+                                        
+                                        <textarea name="gBtyNlfipSBSckpstvmNzKiTaKfzSxxRhiUwZhDNiPpnxoPjCStgrjgWUZXCGhQtWlmvQtTMrZgjWwWmwwx_DQayBycAJBGAzwQMCUTJ_gqRDxAZCmGKkRpGKotTRTDqSfkafKkbdn_XbJvExCyYvwQiGKCOb_thd_zZNbutBfiyRRfAupWOVfwXOCTUHVAdvTubKWsWIFWPOTQpfBVneeMzEcKKHalgfFCzXDrXxAFQJgIvmeqG_NzQGwXiLhOjUqlIQSSbLyqdZwpYTPZdkfgSGnschILQmWwTw_fUMOwCXVsKHzOxIlzqJTCeaqvCmasCAWdTlFRWjevlvhViuPHAXGKdyAvWTtQxeqKlWwLCUdGfYRjtVNJXSrfuM_WkLvCqOyGFXkLzEFgvAfEgSBAGkuenKRZWZcsaaQRbLdWmBKSNKkuhwqRJuwGVTTvFKqZcNGVkOeVpgPFabRdbXtbkKigeKwHsiQcMmr_EPKTRVdefrhvCrUjROqSfarZSWeGPntokRYLNZJOiEBneAFAOiKywYUeZlAvrWOsztKlTIVtFbkbZDwRReticvtLxvndYOYMrJpmrUhFMStUpuFVpkeNdgPD_zpZWtUrDYkPOKbxxoVKCYXCqRoplLjKummsgIkUyCRQJqGfIhQqKFBbbmkEEgGtqZVdYkRoDBN_HHt_LJgDvtAplKQvZfPSxZblVeGZQdmItBUUtkuw_DyxZgsNUXOZnwDjhIfhCHnSGsxjrwBqmTStbeLpntFuONWxymokFNusQgqhjIXYVZnTdKHCxqvJCuDuV_lFIRkZZadvofFeWhYpbCUoeloPSlqXcxLkYSPDpOvCiNP2869580" rows="7" cols="20"  id="gBtyNlfipSBSckpstvmNzKiTaKfzSxxRhiUwZhDNiPpnxoPjCStgrjgWUZXCGhQtWlmvQtTMrZgjWwWmwwx_DQayBycAJBGAzwQMCUTJ_gqRDxAZCmGKkRpGKotTRTDqSfkafKkbdn_XbJvExCyYvwQiGKCOb_thd_zZNbutBfiyRRfAupWOVfwXOCTUHVAdvTubKWsWIFWPOTQpfBVneeMzEcKKHalgfFCzXDrXxAFQJgIvmeqG_NzQGwXiLhOjUqlIQSSbLyqdZwpYTPZdkfgSGnschILQmWwTw_fUMOwCXVsKHzOxIlzqJTCeaqvCmasCAWdTlFRWjevlvhViuPHAXGKdyAvWTtQxeqKlWwLCUdGfYRjtVNJXSrfuM_WkLvCqOyGFXkLzEFgvAfEgSBAGkuenKRZWZcsaaQRbLdWmBKSNKkuhwqRJuwGVTTvFKqZcNGVkOeVpgPFabRdbXtbkKigeKwHsiQcMmr_EPKTRVdefrhvCrUjROqSfarZSWeGPntokRYLNZJOiEBneAFAOiKywYUeZlAvrWOsztKlTIVtFbkbZDwRReticvtLxvndYOYMrJpmrUhFMStUpuFVpkeNdgPD_zpZWtUrDYkPOKbxxoVKCYXCqRoplLjKummsgIkUyCRQJqGfIhQqKFBbbmkEEgGtqZVdYkRoDBN_HHt_LJgDvtAplKQvZfPSxZblVeGZQdmItBUUtkuw_DyxZgsNUXOZnwDjhIfhCHnSGsxjrwBqmTStbeLpntFuONWxymokFNusQgqhjIXYVZnTdKHCxqvJCuDuV_lFIRkZZadvofFeWhYpbCUoeloPSlqXcxLkYSPDpOvCiNP2869580" class="control" disabled="disabled" style="background-color:#F4F4F4;width:99%;opacity:0;position:absolute;">pq 33 Ta 6h CN fW xF L6 Ue X  PG ls 6k Gp </textarea>
+                                        
+                                        <textarea name="_ZKuHHYgqL_RCaIiRpLZjnCQpmyy_EwwOypeSIeUWoXCvAhHAr28695106" rows="7" cols="20"  id="_ZKuHHYgqL_RCaIiRpLZjnCQpmyy_EwwOypeSIeUWoXCvAhHAr28695106" class="control" disabled="disabled" style="background-color:#F4F4F4;width:99%;opacity:0;position:absolute;">DYXgISbw 0mDZb1e4 LpopZeHu Mg4vgWRH QppXolJK 9gZ700r8 4QQQmOzz rDDCYRpe E5iWNrQB PNqTpKDV Z6  fbxb 00GUQhVs 1VD4RDwN aqaHzPkQ 9RM2sZ8D Ih6WU6VI 181DhJew KV 0aZMl R0U8E39c W9wJHI3e DCPAXPIA NrsG iCT EVf3mXd8 8YQhoEYb </textarea>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="tblrow">
+                                <td colspan="2" style="height: 5px;"></td>
+                            </tr>
+                            <tr class="tblrow">
+                                <td colspan="2" align="left" class="txtbold" style="padding: 3px 0px 0px 3px;">
+                                    <img id="imgAlertSelect" src="./Quiz_files/pointer5.gif" style="display: none; visibility: hidden;">Select the correct option
+                                            <div style="float: right; display: normal; margin-right: 5px;">
+                                                
+                                            </div>
+                                </td>
+                            </tr>
+
+                            <tr class="tblrow">
+                                <td colspan="2" valign="top">
+                                    
+                                    <table id="tblAnswer" border="0" cellpadding="0" cellspacing="2" width="100%" style="height: 300px;">
+			<tbody><tr>
+				<td width="50" align="center" valign="middle" style="padding-top:0px; background-color:#E6EDF7; border: 1px solid #287CAC; "><span class="ListControl"><input id="radioBtn0" type="radio" name="rbtn" value="0" onclick="EnableNextButton();"></span></td>
+				<td valign="top" align="left" style="padding-top:5px;padding-left:5px;padding-right:0px;padding-bottom:0px;height:75px; border: 1px solid #287CAC;"><textarea name="lblAnswer0" rows="3" cols="20" id="lblAnswer0" disabled="disabled" class="control" style="width:99%;min-height:75px;max-height:180px;resize:vertical;">Less than two hour
+</textarea></td>
+			</tr>
+			<tr>
+				<td width="50" align="center" valign="middle" style="padding-top:0px; background-color:#E6EDF7; border: 1px solid #287CAC; "><span class="ListControl"><input id="radioBtn1" type="radio" name="rbtn" value="1" onclick="EnableNextButton();"></span></td>
+				<td valign="top" align="left" style="padding-top:5px;padding-left:5px;padding-right:0px;padding-bottom:0px;height:75px; border: 1px solid #287CAC;"><textarea name="lblAnswer1" rows="3" cols="20"  id="lblAnswer1" disabled="disabled" class="control" style="width:99%;min-height:75px;max-height:180px;resize:vertical;">Less than one hour
+</textarea></td>
+			</tr>
+			<tr>
+				<td width="50" align="center" valign="middle" style="padding-top:0px; background-color:#E6EDF7; border: 1px solid #287CAC; "><span class="ListControl"><input id="radioBtn2" type="radio" name="rbtn" value="2" onclick="EnableNextButton();"></span></td>
+				<td valign="top" align="left" style="padding-top:5px;padding-left:5px;padding-right:0px;padding-bottom:0px;height:75px; border: 1px solid #287CAC;"><textarea name="lblAnswer2" rows="3" cols="20" id="lblAnswer2" disabled="disabled" class="control" style="width:99%;min-height:75px;max-height:180px;resize:vertical;">Less than five hour
+</textarea></td>
+			</tr>
+			<tr>
+				<td width="50" align="center" valign="middle" style="padding-top:0px; background-color:#E6EDF7; border: 1px solid #287CAC; "><span class="ListControl"><input id="radioBtn3" type="radio" name="rbtn" value="3" onclick="EnableNextButton();"></span></td>
+				<td valign="top" align="left" style="padding-top:5px;padding-left:5px;padding-right:0px;padding-bottom:0px;height:75px; border: 1px solid #287CAC;"><textarea name="lblAnswer3" rows="3" cols="20"  id="lblAnswer3" disabled="disabled" class="control" style="width:99%;min-height:75px;max-height:180px;resize:vertical;">Less than ten hour</textarea></td>
+			</tr>
+		</tbody></table>
+		
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <div style="text-align: right;">
+                                        <img id="imgAlertSave" src="./Quiz_files/pointer5.gif" style="visibility: hidden;">
+                                        <span style="visibility: hidden; font-size: medium; font-weight: bold;" id="msgSubmit">&nbsp;</span>
+                                        <input type="submit" name="btnSave" value="Click to Save Answer &amp; Move to Next Question" onclick="javascript: return NextButtonStatus(this);" id="btnSave" class="btn" disabled="true" style="width:350px;">
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody></table>
+                    </td>
+	</tr>
+</tbody></table>
+
+        </div>
+    
+
+<script type="text/javascript">
+//<![CDATA[
+
+var callBackFrameUrl='/WebResource.axd?d=Xd0zVnlD580BntUZLksXD_LpRQTUKrcrX8_jUq5aZA3JDfMa5Iijh3z30ZizbV9iQ3AaS67INrT8sWI2bVRZ5va5WHcoRrqdIAEYoZPJ4Mk1&t=637454248939909757';
+WebForm_InitCallback();//]]>
+</script>
+</form>
+
+
+</body></html>
